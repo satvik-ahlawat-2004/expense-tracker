@@ -1,0 +1,11 @@
+{
+  "name": "expense-trackter-project",
+  "private": true,
+  "description": "Expense Tracker app lives in expense-tracker/",
+  "scripts": {
+    "dev": "npm run dev:server",
+    "dev:server": "cd expense-tracker/server && npm run dev",
+    "dev:client": "cd expense-tracker/client && npm run dev",
+    "start:server": "cd expense-tracker/server && npm start"
+  }
+}

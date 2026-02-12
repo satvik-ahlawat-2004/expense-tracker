@@ -1,0 +1,9 @@
+node_modules/
+.env
+*.log
+
+# Service account keys must never be committed to Git. Ignore common key file patterns.
+*credentials*.json
+*-key.json
+*-*.json
+!package-lock.json
