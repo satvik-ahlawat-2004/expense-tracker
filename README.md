@@ -34,8 +34,14 @@ Then open **http://localhost:5173** in your browser.
 
 For full setup (Google Sheet, credentials, env), see **[expense-tracker/README.md](expense-tracker/README.md)**.
 
-## Deploy to Render
+## Deploy
+
+### Render (React + Node app)
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/satvik-ahlawat-2004/expense-tracker)
 
-Click the button above to deploy the app live. Then add `SHEET_ID`, `JWT_SECRET`, and `GOOGLE_APPLICATION_CREDENTIALS_JSON` in the Render dashboard. See **[DEPLOY.md](DEPLOY.md)** for details.
+See **[DEPLOY.md](DEPLOY.md)** for details.
+
+### Streamlit Cloud (Python app, no credit card)
+
+The **Streamlit** version lives in `expense-tracker-streamlit/` and uses the same Google Sheet. Deploy at [share.streamlit.io](https://share.streamlit.io) — no payment required. See **[expense-tracker-streamlit/DEPLOY_STREAMLIT.md](expense-tracker-streamlit/DEPLOY_STREAMLIT.md)**.
