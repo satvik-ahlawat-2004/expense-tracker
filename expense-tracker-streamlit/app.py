@@ -2,9 +2,16 @@
 Matches the React app: auth gate → dashboard with nav → pages + visualizations.
 """
 import streamlit as st
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import bcrypt
 import plotly.express as px
+
+# IST = UTC+5:30
+IST = timezone(timedelta(hours=5, minutes=30))
+
+def now_ist():
+    """Current time in IST (works on Streamlit Cloud which runs in UTC)."""
+    return datetime.now(IST).replace(tzinfo=None)
 
 from sheets_helper import (
     CATEGORIES,
@@ -221,9 +228,9 @@ def render_dashboard():
             st.rerun()
 
     # ── Charts ──
-    now = datetime.now()
-    from_d = now.replace(day=1).strftime("%Y-%m-%d")
-    last = (now.replace(day=1) + timedelta(days=32)).replace(day=1) - timedelta(days=1)
+    now_dt = now_ist()
+    from_d = now_dt.replace(day=1).strftime("%Y-%m-%d")
+    last = (now_dt.replace(day=1) + timedelta(days=32)).replace(day=1) - timedelta(days=1)
     to_d = last.strftime("%Y-%m-%d")
     month_expenses = get_expenses(st.session_state.user_id, from_d, to_d)
 
@@ -300,10 +307,10 @@ def render_add_expense():
 
         col1, col2 = st.columns(2)
         with col1:
-            date = st.date_input("Date", value=datetime.now())
+            date = st.date_input("Date", value=now_ist())
         with col2:
-            now_h = datetime.now().hour
-            now_m = datetime.now().minute
+            now_h = now_ist().hour
+            now_m = now_ist().minute
             # Build 12-hour time options (every minute)
             time_options = []
             for h in range(24):
@@ -376,7 +383,7 @@ def render_view_expenses():
 
     range_opt = st.radio("", ["Today", "This week", "This month"], horizontal=True, label_visibility="collapsed")
 
-    now = datetime.now()
+    now = now_ist()
     if range_opt == "Today":
         from_d = to_d = now.strftime("%Y-%m-%d")
     elif range_opt == "This week":
