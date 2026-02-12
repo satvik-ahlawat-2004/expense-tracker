@@ -33,3 +33,9 @@ cd client && npm run dev
 Then open **http://localhost:5173** in your browser.
 
 For full setup (Google Sheet, credentials, env), see **[expense-tracker/README.md](expense-tracker/README.md)**.
+
+## Deploy to Render
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/satvik-ahlawat-2004/expense-tracker)
+
+Click the button above to deploy the app live. Then add `SHEET_ID`, `JWT_SECRET`, and `GOOGLE_APPLICATION_CREDENTIALS_JSON` in the Render dashboard. See **[DEPLOY.md](DEPLOY.md)** for details.

@@ -121,6 +121,22 @@ expense-tracker/
 └── README.md
 ```
 
+## Deploy to Render
+
+Deploy this app live in one click:
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/satvik-ahlawat-2004/expense-tracker)
+
+After deploying, add these environment variables in the Render dashboard:
+
+| Variable | Value |
+|----------|-------|
+| `SHEET_ID` | Your Google Sheet ID |
+| `JWT_SECRET` | Run `openssl rand -hex 32` locally |
+| `GOOGLE_APPLICATION_CREDENTIALS_JSON` | Full JSON content of your service account key |
+
+See [DEPLOY.md](../DEPLOY.md) in the repo root for detailed steps.
+
 ## License
 
 MIT
