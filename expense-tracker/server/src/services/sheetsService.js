@@ -6,10 +6,15 @@ const SHEET_NAME = 'Expenses';
 const COLUMNS = ['UserId', 'Date', 'Time', 'Amount', 'Category', 'Payment Mode', 'Notes', 'Created Timestamp'];
 
 function getSheetsClient() {
-  const auth = new google.auth.GoogleAuth({
-    keyFile: config.credentialsPath,
+  const authOptions = {
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-  });
+  };
+  if (config.credentials) {
+    authOptions.credentials = config.credentials;
+  } else if (config.credentialsPath) {
+    authOptions.keyFile = config.credentialsPath;
+  }
+  const auth = new google.auth.GoogleAuth(authOptions);
   const sheets = google.sheets({ version: 'v4', auth });
   return { sheets, sheetId: config.sheetId };
 }

@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: expense-tracker
+    runtime: node
+    rootDir: expense-tracker
+
+    buildCommand: |
+      cd client && npm install && npm run build
+      cd ../server && npm install
+    startCommand: cd server && npm start
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        generateValue: true
+      - key: SHEET_ID
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: GOOGLE_APPLICATION_CREDENTIALS_JSON
+        sync: false
