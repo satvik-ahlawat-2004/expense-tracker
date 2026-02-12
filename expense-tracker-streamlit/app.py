@@ -1,9 +1,10 @@
 """Expense Tracker - Streamlit app with Google Sheets backend.
-Matches the React app: auth gate → dashboard with nav → add/view/time-of-day pages.
+Matches the React app: auth gate → dashboard with nav → pages + visualizations.
 """
 import streamlit as st
 from datetime import datetime, timedelta
 import bcrypt
+import plotly.express as px
 
 from sheets_helper import (
     CATEGORIES,
@@ -219,6 +220,69 @@ def render_dashboard():
             go("expenses")
             st.rerun()
 
+    # ── Charts ──
+    now = datetime.now()
+    from_d = now.replace(day=1).strftime("%Y-%m-%d")
+    last = (now.replace(day=1) + timedelta(days=32)).replace(day=1) - timedelta(days=1)
+    to_d = last.strftime("%Y-%m-%d")
+    month_expenses = get_expenses(st.session_state.user_id, from_d, to_d)
+
+    if month_expenses:
+        st.markdown("---")
+
+        # Category pie chart
+        cat_totals = {}
+        for e in month_expenses:
+            cat_totals[e["category"]] = cat_totals.get(e["category"], 0) + e["amount"]
+
+        col_pie, col_bar = st.columns(2)
+        with col_pie:
+            fig_cat = px.pie(
+                values=list(cat_totals.values()),
+                names=list(cat_totals.keys()),
+                title="Spending by Category",
+                color_discrete_sequence=px.colors.qualitative.Set2,
+                hole=0.4,
+            )
+            fig_cat.update_layout(margin=dict(t=40, b=0, l=0, r=0), height=300)
+            st.plotly_chart(fig_cat, use_container_width=True)
+
+        # Daily spending bar chart
+        with col_bar:
+            daily_totals = {}
+            for e in month_expenses:
+                daily_totals[e["date"]] = daily_totals.get(e["date"], 0) + e["amount"]
+            dates = sorted(daily_totals.keys())
+            amounts = [daily_totals[d] for d in dates]
+            # Show only day number for cleaner labels
+            labels = [d.split("-")[-1] for d in dates]
+
+            fig_daily = px.bar(
+                x=labels,
+                y=amounts,
+                title="Daily Spending (This Month)",
+                labels={"x": "Day", "y": "₹"},
+                color_discrete_sequence=["#2563eb"],
+            )
+            fig_daily.update_layout(margin=dict(t=40, b=0, l=0, r=0), height=300)
+            st.plotly_chart(fig_daily, use_container_width=True)
+
+        # Payment mode pie chart
+        mode_totals = {}
+        for e in month_expenses:
+            mode_totals[e["paymentMode"]] = mode_totals.get(e["paymentMode"], 0) + e["amount"]
+
+        if len(mode_totals) > 1:
+            fig_mode = px.pie(
+                values=list(mode_totals.values()),
+                names=list(mode_totals.keys()),
+                title="By Payment Mode",
+                color_discrete_sequence=px.colors.qualitative.Pastel,
+                hole=0.4,
+            )
+            fig_mode.update_layout(margin=dict(t=40, b=0, l=0, r=0), height=280)
+            st.plotly_chart(fig_mode, use_container_width=True)
+
 
 # ── Add Expense ──────────────────────────────────────────────────────────────
 
@@ -335,6 +399,38 @@ def render_view_expenses():
             go("add")
             st.rerun()
     else:
+        # Charts for this range
+        cat_totals = {}
+        mode_totals = {}
+        for e in expenses:
+            cat_totals[e["category"]] = cat_totals.get(e["category"], 0) + e["amount"]
+            mode_totals[e["paymentMode"]] = mode_totals.get(e["paymentMode"], 0) + e["amount"]
+
+        ch1, ch2 = st.columns(2)
+        with ch1:
+            fig = px.pie(
+                values=list(cat_totals.values()),
+                names=list(cat_totals.keys()),
+                title="By Category",
+                color_discrete_sequence=px.colors.qualitative.Set2,
+                hole=0.4,
+            )
+            fig.update_layout(margin=dict(t=40, b=0, l=0, r=0), height=280)
+            st.plotly_chart(fig, use_container_width=True)
+        with ch2:
+            fig2 = px.pie(
+                values=list(mode_totals.values()),
+                names=list(mode_totals.keys()),
+                title="By Payment Mode",
+                color_discrete_sequence=px.colors.qualitative.Pastel,
+                hole=0.4,
+            )
+            fig2.update_layout(margin=dict(t=40, b=0, l=0, r=0), height=280)
+            st.plotly_chart(fig2, use_container_width=True)
+
+        st.markdown("---")
+
+        # Expense list
         for e in expenses:
             col_info, col_amount = st.columns([3, 1])
             with col_info:
