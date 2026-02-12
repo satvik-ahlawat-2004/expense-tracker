@@ -34,9 +34,13 @@ def _get_credentials():
     creds_dict = None
     try:
         import streamlit as st
-        if hasattr(st, "secrets") and st.secrets.get("GOOGLE_APPLICATION_CREDENTIALS_JSON"):
+        if hasattr(st, "secrets") and "GOOGLE_APPLICATION_CREDENTIALS_JSON" in st.secrets:
             v = st.secrets["GOOGLE_APPLICATION_CREDENTIALS_JSON"]
-            creds_dict = v if isinstance(v, dict) else json.loads(str(v))
+            if isinstance(v, str):
+                creds_dict = json.loads(v)
+            else:
+                # Streamlit TOML sections become AttrDict — convert to plain dict
+                creds_dict = dict(v)
     except Exception:
         pass
     if not creds_dict:
