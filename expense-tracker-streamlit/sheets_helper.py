@@ -1,24 +1,23 @@
 """Google Sheets helper - reads/writes Expenses and Users using same schema as Node app."""
 import os
 import json
-import secrets
+import secrets as _secrets_mod  # renamed to avoid conflict with st.secrets
 from datetime import datetime
 from typing import Optional
 
 import gspread
 from google.oauth2.service_account import Credentials
 
+
 def _get_sheet_id():
+    # Try Streamlit secrets first
     try:
         import streamlit as st
-        if hasattr(st, "secrets") and st.secrets.get("SHEET_ID"):
-            return st.secrets["SHEET_ID"]
+        return st.secrets["SHEET_ID"]
     except Exception:
         pass
+    # Fall back to env var
     return os.environ.get("SHEET_ID") or None
-
-
-SHEET_ID = None  # Set at runtime
 EXPENSES_TAB = "Expenses"
 USERS_TAB = "Users"
 
@@ -34,13 +33,13 @@ def _get_credentials():
     creds_dict = None
     try:
         import streamlit as st
-        if hasattr(st, "secrets") and "GOOGLE_APPLICATION_CREDENTIALS_JSON" in st.secrets:
-            v = st.secrets["GOOGLE_APPLICATION_CREDENTIALS_JSON"]
-            if isinstance(v, str):
-                creds_dict = json.loads(v)
-            else:
-                # Streamlit TOML sections become AttrDict — convert to plain dict
-                creds_dict = dict(v)
+        v = st.secrets["GOOGLE_APPLICATION_CREDENTIALS_JSON"]
+        if isinstance(v, str):
+            creds_dict = json.loads(v)
+        elif hasattr(v, "to_dict"):
+            creds_dict = v.to_dict()
+        else:
+            creds_dict = dict(v)
     except Exception:
         pass
     if not creds_dict:
@@ -98,7 +97,7 @@ def parse_sheet_time(val):
 
 
 def generate_user_id():
-    return secrets.token_hex(16)
+    return _secrets_mod.token_hex(16)
 
 
 # --- Users ---
